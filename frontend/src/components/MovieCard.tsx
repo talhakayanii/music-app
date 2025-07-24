@@ -1,6 +1,7 @@
 import React, { useState, memo } from 'react';
 import { Movie } from '../types/movie';
 import { imageHelpers } from '../utils/movieApi';
+import { useFavorites } from '../hooks/useFavorites';
 
 interface MovieCardProps {
   movie: Movie;
@@ -12,6 +13,10 @@ const MovieCard: React.FC<MovieCardProps> = memo(({ movie, onClick, className = 
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
+
+  const { isFavorite, addToFavorites, removeFromFavorites } = useFavorites();
+  const isMovieFavorite = isFavorite(movie.id);
 
   const handleImageLoad = () => {
     setImageLoaded(true);
@@ -37,10 +42,31 @@ const MovieCard: React.FC<MovieCardProps> = memo(({ movie, onClick, className = 
     return 'rating-poor';
   };
 
-  // Truncate overview for hover display
   const truncateText = (text: string, maxLength: number = 150): string => {
     if (!text) return 'No plot available.';
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  };
+
+  // Handle favorite toggle
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent movie card click
+    
+    if (favoriteLoading) return;
+
+    try {
+      setFavoriteLoading(true);
+      
+      if (isMovieFavorite) {
+        await removeFromFavorites(movie.id);
+      } else {
+        await addToFavorites(movie);
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      // You could add a toast notification here
+    } finally {
+      setFavoriteLoading(false);
+    }
   };
 
   return (
@@ -81,7 +107,61 @@ const MovieCard: React.FC<MovieCardProps> = memo(({ movie, onClick, className = 
           }}
         />
         
-       
+        {/* Favorite Heart Button */}
+        <button
+          onClick={handleFavoriteClick}
+          disabled={favoriteLoading}
+          className="favorite-btn"
+          style={{
+            position: 'absolute',
+            top: '8px',
+            right: '8px',
+            background: 'rgba(0, 0, 0, 0.7)',
+            border: 'none',
+            borderRadius: '50%',
+            width: '32px',
+            height: '32px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            zIndex: 30,
+            opacity: favoriteLoading ? 0.6 : 1,
+            transform: favoriteLoading ? 'scale(0.9)' : 'scale(1)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(0, 0, 0, 0.9)';
+            e.currentTarget.style.transform = 'scale(1.1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(0, 0, 0, 0.7)';
+            e.currentTarget.style.transform = favoriteLoading ? 'scale(0.9)' : 'scale(1)';
+          }}
+        >
+          {favoriteLoading ? (
+            <div 
+              style={{
+                width: '12px',
+                height: '12px',
+                border: '2px solid #ffffff',
+                borderTop: '2px solid transparent',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite'
+              }}
+            />
+          ) : (
+            <span 
+              style={{
+                fontSize: '14px',
+                color: isMovieFavorite ? '#ff4757' : '#ffffff',
+                transition: 'color 0.2s ease'
+              }}
+            >
+              {isMovieFavorite ? '❤️' : '🤍'}
+            </span>
+          )}
+        </button>
 
         {/* Hover Overlay with Plot */}
         <div 
@@ -189,6 +269,8 @@ const MovieCard: React.FC<MovieCardProps> = memo(({ movie, onClick, className = 
           )}
         </div>
       </div>
+
+      
     </div>
   );
 });

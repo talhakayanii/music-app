@@ -1170,3 +1170,32 @@ body {
   box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.5); /* Focus outline for accessibility */
 }
 /* Refactored*/
+
+
+/*Favourrites utton on dashboard.tsx*/
+
+.favorites-btn {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 5px 10px;
+  background: linear-gradient(90deg, #3b82f6, #6366f1); /* Gradient from blue to indigo */
+  color: white;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out; /* Smooth transition */
+}
+
+.favorites-btn:hover {
+  background: linear-gradient(90deg, #2563eb, #4f46e5); /* Slightly lighter on hover */
+  transform: scale(1.05); /* Scale up the button on hover */
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2); /* Increase shadow on hover */
+}
+
+.favorites-btn:focus {
+  outline: none; /* Removes focus outline */
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.5); /* Focus outline for accessibility */
+}
