@@ -5,6 +5,7 @@ import { connectDB } from './config/database';
 import authRoutes from './routes/auth';
 import logger from './config/logger'; // Importing logger
 import { sendResponse } from './utlis/responseHelper'; // Importing sendResponse
+import favoritesRoutes from './routes/favorites';
 
 // Load environment variables
 dotenv.config();
@@ -25,7 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/auth', authRoutes);
-
+app.use('/api/favorites', favoritesRoutes);
 // Health check route
 app.get('/api/health', (req, res) => {
   sendResponse(res, { success: true, message: 'Server is running!' });
